@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-import pyshorteners
 import validators
+from urllib.parse import urlsplit
 
 router = APIRouter()
 
@@ -17,26 +17,39 @@ class Item(BaseModel):
 
 url_db = {}
 
-def url_shortener(url: str) -> str:
+def generate_id(url: str) -> str:
+    """
+    Generate a short identifier from the first three letters of the domain name.
     
-    s = pyshorteners.Shortener()
+    """
+    parsed_url = urlsplit(url)  # Split URL to get essential parts
 
-    return s.tinyurl.short(url)
+    domain = parsed_url.netloc.replace("www.", "")  # Remove 'www.' if present
 
+    id = domain[:3]  # Take first three letters of domain to be the id
 
+    counter = 1
+    while id in url_db:
+        id = f"{id}{counter}"
 
-@router.get("/", status_code= 200)
+    return id   
+
+@router.get("/", status_code = 200)
 def list_keys():
     return JSONResponse({"keys": list(url_db.keys())}, status_code=200)
 
-@router.post("/", status_code=201)
+@router.post("/", status_code = 201)
 def shorten_url(item: Item):
     if not validators.url(item.url):
         raise HTTPException(status_code=400, detail="error: Invalid URL")
 
-    shorten_url = url_shortener(item.url)
+    shorten_url = generate_id(item.url)
     url_db[shorten_url] = item.url
-    return {"Short_url": shorten_url}
+    return {"short": shorten_url}
+
+@router.delete("/" , status_code = 404) #Not sure if we are meant to delete all urls or just do nothing
+def delete_all_url():
+    raise HTTPException(status_code = 404, details = "error: Not Supported (No ID)")
 
 
 @router.get("/{url_key}", status_code=301)
