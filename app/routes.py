@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import validators
 from urllib.parse import urlsplit
+import re
 
 router = APIRouter()
 
@@ -33,6 +34,20 @@ def generate_id(url: str) -> str:
         id = f"{id}{counter}"
 
     return id   
+
+def validate_url(url:str) -> bool:
+    """
+    Validate URL using regex
+    """
+
+    regex = ("((http|https)://)(www.)?" +
+             "[a-zA-Z0-9@:%._\\+~#?&//=]" +
+             "{2,256}\\.[a-z]" +
+             "{2,10}\\b([-a-zA-Z0-9@:%" +
+             "._\\+~#?&//=]*)")
+    
+    pattern = re.compile(regex)
+    return bool(re.fullmatch(pattern, url))    
 
 @router.get("/", status_code = 200)
 def list_keys():
