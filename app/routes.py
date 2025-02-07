@@ -29,9 +29,12 @@ def generate_id(url: str) -> str:
 
     id = domain[:3]  # Take first three letters of domain to be the id
 
+    hold = id
     counter = 1
     while id in url_db:
-        id = f"{id}{counter}"
+        print(counter)
+        id = hold + str(counter)
+        counter += 1
 
     return id   
 
