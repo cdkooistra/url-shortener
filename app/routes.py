@@ -58,7 +58,8 @@ def list_keys():
 
 @router.post("/", status_code = 201)
 def shorten_url(item: Item):
-    if not validators.url(item.value):
+    if not validate_url(item.value):
+    #if not validators.url(item.value):
         raise HTTPException(status_code=400, detail="error: Invalid URL")
 
     shorten_url = generate_id(item.value)
@@ -84,7 +85,8 @@ def update_url(url_key: str, item: Item):
         raise HTTPException(status_code=404, detail="error: URL not found")
     
     # catch any other exception for return code 400? "error"
-    if not validators.url(item.value):
+    #if not validators.url(item.value):
+    if not validate_url(item.value):
         raise HTTPException(status_code=400, detail="error: Invalid URL")
 
     url_db[url_key] = item.value
