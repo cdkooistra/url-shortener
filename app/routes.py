@@ -12,9 +12,9 @@ class Item(BaseModel):
     Item model representing a URL.
 
     Attributes:
-        url (str): The URL string.
+        value (str): The URL string.
     """
-    url: str
+    value: str
 
 url_db = {}
 
@@ -58,16 +58,16 @@ def list_keys():
 
 @router.post("/", status_code = 201)
 def shorten_url(item: Item):
-    if not validators.url(item.url):
+    if not validators.url(item.value):
         raise HTTPException(status_code=400, detail="error: Invalid URL")
 
-    shorten_url = generate_id(item.url)
-    url_db[shorten_url] = item.url
-    return {"short": shorten_url}
+    shorten_url = generate_id(item.value)
+    url_db[shorten_url] = item.value
+    return {"id": shorten_url}
 
-@router.delete("/" , status_code = 404) #Not sure if we are meant to delete all urls or just do nothing
-def delete_all_url():
-    raise HTTPException(status_code = 404, details = "error: Not Supported (No ID)")
+@router.delete("/" , status_code = 404) 
+def delete_nothing():
+    raise HTTPException(status_code = 404, detail = "error: Not Supported (No ID)")
 
 
 @router.get("/{url_key}", status_code=301)
@@ -75,7 +75,7 @@ def redirect_url(url_key: str):
     if url_key not in url_db:
         raise HTTPException(status_code=404, detail="error: URL not found")
     
-    return JSONResponse(status_code=301, content={"Location": url_db[url_key]})
+    return JSONResponse(status_code=301, content={"value": url_db[url_key]})
 
 
 @router.put("/{url_key}", status_code=200)
@@ -84,8 +84,10 @@ def update_url(url_key: str, item: Item):
         raise HTTPException(status_code=404, detail="error: URL not found")
     
     # catch any other exception for return code 400? "error"
+    if not validators.url(item.value):
+        raise HTTPException(status_code=400, detail="error: Invalid URL")
 
-    url_db[url_key] = item.url
+    url_db[url_key] = item.value
     return {"updated url key": url_key}
 
 @router.delete("/{url_key}", status_code=204)
