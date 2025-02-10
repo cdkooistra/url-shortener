@@ -32,7 +32,7 @@ def validate_url(url:str) -> bool:
              "[a-zA-Z0-9@:%._\\+~#?&//=]" +
              "{2,256}\\.[a-z]" +
              "{2,10}\\b([-a-zA-Z0-9@:%" +
-             "._\\+~#?&//=]*)")
+             "._\\+~#?&'//=\\-–]*)")
     
     pattern = re.compile(regex)
     return bool(re.fullmatch(pattern, url))    
