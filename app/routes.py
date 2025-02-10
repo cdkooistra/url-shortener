@@ -1,6 +1,6 @@
 import validators
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from app.services import generate_id, validate_url
 from app.models import SessionDep, select, URLModel, delete
 from app.schemas import URLSchema
@@ -58,7 +58,7 @@ async def update_url(url_key: str, request: Request, session: SessionDep):
     if not new_url or not validate_url(new_url): 
         raise HTTPException(status_code=400, detail="error: Invalid URL")
     
-    shorten_url = URLModel(url=entry.url, value=generate_id(new_url))
+    shorten_url = URLModel(url=new_url, value=url_key)
 
     session.delete(entry)
     session.commit()   
@@ -77,4 +77,5 @@ def delete_url(url_key: str, session: SessionDep):
 
     session.delete(url)
     session.commit()
-    return JSONResponse(status_code=204, content={})
+    
+    return Response(status_code=204)
