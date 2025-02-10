@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import validators
 from urllib.parse import urlsplit
 import re
+import hashlib
 
 router = APIRouter()
 
@@ -27,16 +28,17 @@ def generate_id(url: str) -> str:
 
     domain = parsed_url.netloc.replace("www.", "")  # Remove 'www.' if present
 
-    id = domain[:3]  # Take first three letters of domain to be the id
+    id = domain[:2]  # Take first three letters of domain to be the id
+    hash_val = hashlib.md5(url.encode()).hexdigest()[:2]
 
-    hold = id
-    counter = 1
-    while id in url_db:
-        print(counter)
-        id = hold + str(counter)
-        counter += 1
+    # hold = id
+    # counter = 1
+    # while id in url_db:
+    #     print(counter)
+    #     id = hold + str(counter)
+    #     counter += 1
 
-    return id   
+    return id + hash_val
 
 def validate_url(url:str) -> bool:
     """
