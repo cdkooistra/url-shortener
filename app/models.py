@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends
-from sqlmodel import SQLModel, Field, create_engine, Session, select
+from sqlmodel import SQLModel, Field, create_engine, Session, select, Integer, delete
 
 sqlite_db = f"sqlite:///database.db"
 
@@ -14,8 +14,9 @@ def get_session():
     with Session(engine) as session:
         yield session
 
-# do this to avoid having to with open statements in each route definition
+# do this to avoid having to 'with open' statements in each route definition
 SessionDep = Annotated[Session, Depends(get_session)]
 
 class URLModel(SQLModel, table=True):
-    value: str = Field(primary_key=True, index=True)
+    url: str = Field(primary_key=True, index=True)
+    value: str = Field(index=True)
