@@ -28,11 +28,10 @@ def validate_url(url:str) -> bool:
     Validate URL using regex
     """
 
-    regex = ("((http|https)://)(www.)?" +
-             "[a-zA-Z0-9@:%._\\+~#?&//=]" +
-             "{2,256}\\.[a-z]" +
-             "{2,10}\\b([-a-zA-Z0-9@:%" +
-             "._\\+~#?&'//=\\-–]*)")
+    regex = ("((http|https)://)(www.)?" + # for 'http://' or 'https://' and optionally www.
+             "([a-zA-Z0-9.-]+)" +  # for a variety of domain names (letters, numbers, dots, etc,)
+             "(\.[a-zA-Z]{2,10}([-a-zA-Z0-9@:%._\\+~#?&/=]*)?)" + # for domain extensions (.com, .org, etc.)
+             "(/.*)?$") # for path/query string 
     
     pattern = re.compile(regex)
     return bool(re.fullmatch(pattern, url))    
