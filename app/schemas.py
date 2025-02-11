@@ -1,1 +1,4 @@
-# implement pydantic schemes here if needed
+from pydantic import BaseModel
+
+class URLSchema(BaseModel):
+    value: str
