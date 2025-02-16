@@ -1,5 +1,6 @@
 # JWT logic here
-from utils import b64_encode, b64_decode, sha256, json
+from app.auth.utils import b64_encode, b64_decode, sha256
+import json
 import os
 
 def create_jwt(payload: dict) -> str:
