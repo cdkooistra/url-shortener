@@ -12,6 +12,9 @@ def create_jwt(payload: dict) -> str:
 
     # TODO: Unsure what to do with the payload
 
+    #Encoded the payload as well
+    payload = b64_encode(json.dumps(payload).encode()) 
+
     signature = sha256(header + "." + payload, os.environ.get("SECRET")).hexdigest()
 
     return f"{header}.{payload}.{signature}"

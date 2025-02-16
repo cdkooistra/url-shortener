@@ -14,13 +14,6 @@ def generate_id(url: str) -> str:
     id = domain[:2]  # Take first three letters of domain to be the id
     hash_val = hashlib.md5(url.encode()).hexdigest()[:2]
 
-    # hold = id
-    # counter = 1
-    # while id in url_db:
-    #     print(counter)
-    #     id = hold + str(counter)
-    #     counter += 1
-
     return str(id + hash_val)
 
 def validate_url(url:str) -> bool:

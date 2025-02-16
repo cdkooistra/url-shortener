@@ -21,3 +21,7 @@ def b64_decode(data: str) -> bytes:
 def hash_password(password: str) -> str:
     # Helper function to hash the password using sha256.
     return sha256(password.encode()).hexdigest()
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    #Verifies a password against the stored hash
+    return hash_password(password) == hashed_password
