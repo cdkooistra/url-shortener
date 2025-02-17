@@ -17,8 +17,6 @@ def get_session():
 # do this to avoid having to 'with open' statements in each route definition
 SessionDep = Annotated[Session, Depends(get_session)]
 
-class URLModel(SQLModel, table=True):
-    url: str = Field(primary_key=True, index=True)
-    value: str = Field(index=True)
-
-
+class UserModel(SQLModel, table=True):
+    username: str = Field(primary_key=True, index=True)
+    password_hash: str  # Store hashed passwords   

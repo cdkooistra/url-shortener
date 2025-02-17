@@ -2,9 +2,9 @@
 # verify credentials
 
 from sqlmodel import Session, select
-from app.models import UserModel, SessionDep
-from app.auth.utils import hash_password, verify_password
-from app.auth.jwt import create_jwt
+from auth.models import UserModel, SessionDep
+from auth.utils import hash_password, verify_password
+from auth.jwt import create_jwt
 
 # Creates a new user if the username is unique.
 def create_user(username: str, password: str, session: SessionDep) -> bool:

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import JSONResponse, Response
 import os
-from app.auth.auth import verify_user, create_user
-from app.models import SessionDep, UserModel
+from auth.services import verify_user, create_user
+from auth.models import SessionDep, UserModel
 from sqlmodel import Session, select
-from app.schemas import UserSchema
-from app.auth.jwt import create_jwt, verify_jwt
+from auth.schemas import UserSchema
+from auth.jwt import create_jwt, verify_jwt
 router = APIRouter()
 
 

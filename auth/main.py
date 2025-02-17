@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-from app.routes import router as main_router
-# from app.auth.routes import router as auth_router
-from app.models import create_database
+from auth.routes import router as auth_router
+from auth.models import create_database
 from dotenv import load_dotenv
 
 load_dotenv()           # we should be passing secrets as env variables in a .env file
@@ -9,5 +8,4 @@ load_dotenv()           # we should be passing secrets as env variables in a .en
 create_database()
 
 app = FastAPI()
-app.include_router(main_router)
-# app.include_router(auth_router, prefix="/auth")
+app.include_router(auth_router)

@@ -1,4 +1,4 @@
-from app.auth.utils import b64_encode, b64_decode, sha256, hmac
+from auth.utils import b64_encode, b64_decode, sha256, hmac
 from datetime import datetime, timedelta
 from typing import Union
 import json
