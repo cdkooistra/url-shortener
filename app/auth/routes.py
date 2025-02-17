@@ -1,26 +1,30 @@
-from fastapi import APIRouter, HTTPException, Response, Depends
+from fastapi import APIRouter, HTTPException, Response
+from fastapi.responses import JSONResponse, Response
 import os
-from app.auth.auth import verify_user
-from app.models import SessionDep
-from sqlmodel import Session
+from app.auth.auth import verify_user, create_user
+from app.models import SessionDep, UserModel
+from sqlmodel import Session, select
 from app.schemas import UserSchema
-
 router = APIRouter()
+
+
+@router.get("/", status_code=200)
+def list_users(session: SessionDep):
+    keys = session.exec(select(UserModel.username)).all()
+    if not keys:
+        return JSONResponse({}, status_code=200)
+    return JSONResponse(keys, status_code=200)
 
 # @router.post("/users")
 # params: username, password
 # do: create user with username and password and store in db -> user_table
 # return 201, 409 if user already exists
 
-#TODO: Work in progress, gets 500 internal error with TypeError: __init__() takes 1 positional argument but 4 were given
-
 @router.post("/users", status_code=201)
 def create_new_users(user: UserSchema, session: SessionDep):
-    success = UserSchema(user.username, user.password, session)
-    
-    if not success:
+
+    if not create_user(user.username, user.password, session):
         raise HTTPException(status_code=409, detail="Username already exists")
-    
     return {"message": "User created successfully"}
 
 # @router.put("/users")
