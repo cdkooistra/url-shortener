@@ -1,33 +1,33 @@
-# JWT logic here
-from app.auth.utils import b64_encode, b64_decode, sha256
+from app.auth.utils import b64_encode, b64_decode, sha256, hmac
+from datetime import datetime, timedelta
+from typing import Union
 import json
 import os
 
 def create_jwt(payload: dict) -> str:
-    # create a JWT token using the payload and secret
     header = {
         "alg": "HS256",
         "typ": "JWT"
     }
-    header = b64_encode(json.dumps(header).encode())
+    header_enc = b64_encode(json.dumps(header).encode())
 
-    # TODO: Unsure what to do with the payload
+    payload["exp"] = (datetime.now() + timedelta(minutes=int(os.environ.get("TOKEN_EXPIRATION_MINUTES")))).timestamp()
+    payload_enc = b64_encode(json.dumps(payload).encode()) 
 
-    #Encoded the payload as well
-    payload = b64_encode(json.dumps(payload).encode()) 
+    signature = hmac.new(os.environ.get("SECRET").encode(), f"{header_enc}.{payload_enc}".encode(), sha256).digest()
+    signature_enc = b64_encode(signature)
 
-    signature = sha256(header + "." + payload, os.environ.get("SECRET")).hexdigest()
+    return f"{header_enc}.{payload_enc}.{signature_enc}"
 
-    return f"{header}.{payload}.{signature}"
+def verify_jwt(token: str) -> Union[dict, bool]:
+    header_enc, payload_enc, signature_enc = token.split(".")
+    expected_signature = hmac.new(os.environ.get("SECRET").encode(), f"{header_enc}.{payload_enc}".encode(), sha256).digest()
 
-
-def verify_jwt(token: str) -> bool:
-    # verify the JWT token using the secret
-    header, payload, signature = token.split(".")
-
-    expected_signature = sha256(header + "." + payload, os.environ.get("SECRET")).hexdigest()
-
-    if expected_signature is not signature:
+    if not hmac.compare_digest(b64_encode(expected_signature), signature_enc):
         return False
-    else: 
-        return True
+    
+    payload = json.loads(b64_decode(payload_enc).decode())
+    if datetime.now().timestamp() > payload.get("exp",0):
+        return False
+    
+    return payload # either return False or return payload. Error handling not in this file but in routes.py

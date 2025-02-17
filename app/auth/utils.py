@@ -1,5 +1,6 @@
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from hashlib import sha256
+import hmac
 
 # i should probably start using docstrings for these comments
 
@@ -17,7 +18,7 @@ def b64_decode(data: str) -> bytes:
     padding = '=' * (4 - len(data) % 4)
     return urlsafe_b64decode(data + padding)
 
-# TODO:
+# TODO: we only save hashed passwords in our db, this is best practice
 def hash_password(password: str) -> str:
     # Helper function to hash the password using sha256.
     return sha256(password.encode()).hexdigest()

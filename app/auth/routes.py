@@ -5,6 +5,7 @@ from app.auth.auth import verify_user, create_user
 from app.models import SessionDep, UserModel
 from sqlmodel import Session, select
 from app.schemas import UserSchema
+from app.auth.jwt import create_jwt, verify_jwt
 router = APIRouter()
 
 
@@ -52,3 +53,10 @@ def login(username: str, password: str, session: SessionDep):
 def debug_env(variable_name: str, response: Response):
     # WARNING: Exposing environment variables in production can be a security risk.
     return {variable_name: os.environ.get(variable_name, "Not Found")}
+
+@router.get("/debug/jwt")
+def debug_jwt():
+    test_payload = {"user_id": 123, "role": "admin"}
+    token = create_jwt(test_payload)
+    decoded_payload = verify_jwt(token)
+    return {"token": token, "decoded_payload": decoded_payload}
