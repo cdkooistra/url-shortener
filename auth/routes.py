@@ -47,14 +47,14 @@ def update_user_password(username: str, old_password: str, new_password: str, se
 # return 200, 403 if user does not exist
 
 @router.post("/users/login")
-def login(username: str, password: str, session: SessionDep):
+def login(user: UserSchema, session: SessionDep):
     """Logs in a user and returns a JWT if credentials are valid."""
-    token = verify_user(username, password, session)
+    token = verify_user(user.username, user.password, session)
     
     if not token:
         raise HTTPException(status_code=403, detail="Invalid credentials")  # Using 403 per your comment
     
-    return {"access_token": token, "token_type": "bearer"}
+    return {"token": token, "token_type": "bearer"}
 
 
 @router.get("/users/verify")
