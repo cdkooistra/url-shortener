@@ -20,5 +20,5 @@ SessionDep = Annotated[Session, Depends(get_session)]
 class URLModel(SQLModel, table=True):
     url: str = Field(primary_key=True, index=True)
     value: str = Field(index=True)
-
+    username: str= Field(index=True) # Track users and their urls
 

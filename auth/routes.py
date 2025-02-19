@@ -1,13 +1,15 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Security
 from fastapi.responses import JSONResponse, Response
+from fastapi.security import HTTPBearer
 import os
 from auth.services import verify_user, create_user, update_password
 from auth.models import SessionDep, UserModel
 from sqlmodel import Session, select
 from auth.schemas import UserSchema
 from auth.jwt import create_jwt, verify_jwt
-router = APIRouter()
 
+
+router = APIRouter()
 
 @router.get("/", status_code=200)
 def list_users(session: SessionDep):
@@ -53,6 +55,14 @@ def login(username: str, password: str, session: SessionDep):
         raise HTTPException(status_code=403, detail="Invalid credentials")  # Using 403 per your comment
     
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.get("/users/verify")
+def verify_user_token(token: str = Security(HTTPBearer())):
+    payload = verify_jwt(token.credentials)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return payload
 
 
 @router.get("/debug/env/")

@@ -1,6 +1,10 @@
 from urllib.parse import urlsplit
 import re
 import hashlib
+import requests
+import os
+
+AUTH_SERVICE_URL = "http://127.0.0.1:8001"
 
 def generate_id(url: str) -> str:
     """
@@ -28,3 +32,12 @@ def validate_url(url:str) -> bool:
     
     pattern = re.compile(regex)
     return bool(re.fullmatch(pattern, url))    
+
+def verify_token(token: str):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(f"{AUTH_SERVICE_URL}/users/verify", headers=headers)
+    
+    if response.status_code != 200:
+        return None  # Invalid token
+
+    return response.json()  # Returns the payload (e.g., {"sub": "username"})

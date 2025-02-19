@@ -1,6 +1,3 @@
-# auth logic here:
-# verify credentials
-
 from sqlmodel import Session, select
 from auth.models import UserModel, SessionDep
 from auth.utils import hash_password, verify_password
