@@ -26,7 +26,7 @@ def verify_user(username: str, password: str, session: SessionDep) -> bool:
     
     if user and verify_password(password, user.password_hash):
         payload = {"sub": username} # jwt payload with username
-        return create_jwt # returns jwt when verified
+        return create_jwt(payload) # returns jwt when verified
     
     return False
 

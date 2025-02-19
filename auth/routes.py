@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import JSONResponse, Response
 import os
-from auth.services import verify_user, create_user
+from auth.services import verify_user, create_user, update_password
 from auth.models import SessionDep, UserModel
 from sqlmodel import Session, select
 from auth.schemas import UserSchema
@@ -23,7 +23,6 @@ def list_users(session: SessionDep):
 
 @router.post("/users", status_code=201)
 def create_new_users(user: UserSchema, session: SessionDep):
-
     if not create_user(user.username, user.password, session):
         raise HTTPException(status_code=409, detail="Username already exists")
     return {"message": "User created successfully"}
@@ -32,6 +31,13 @@ def create_new_users(user: UserSchema, session: SessionDep):
 # params: username, old-password, new-password
 # do: update password for user with username and old-password
 # return 200, 403 if old-password does not match
+
+@router.put("/users", status_code=200)
+def update_user_password(username: str, old_password: str, new_password: str, session: SessionDep):
+    if not update_password(username, old_password, new_password, session):
+        raise HTTPException(status_code=403, detail="Invalid credentials")
+    return {"message": "Password updated successfully"}
+
 
 # @router.post("/users/login")
 # params: username, password
@@ -43,7 +49,7 @@ def login(username: str, password: str, session: SessionDep):
     """Logs in a user and returns a JWT if credentials are valid."""
     token = verify_user(username, password, session)
     
-    if token is None:
+    if not token:
         raise HTTPException(status_code=403, detail="Invalid credentials")  # Using 403 per your comment
     
     return {"access_token": token, "token_type": "bearer"}
