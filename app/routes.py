@@ -49,14 +49,24 @@ def shorten_url(item: URLSchema, session: SessionDep, token: str = Security(sec)
     return {"id": shorten_url.value}
 
 @router.delete("/" , status_code=404) 
-def delete_nothing(session: SessionDep):
+def delete_nothing(session: SessionDep, token: str = Security(sec)):
+    user = verify_token(token.credentials)
+
+    if not user:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     session.exec(delete(URLModel))
     session.commit()
     return JSONResponse(status_code=404, content={})
 
 @router.get("/{url_key}", status_code=301)
-def redirect_url(url_key: str, session: SessionDep):
-    entry = session.exec(select(URLModel).where(URLModel.value == url_key)).first()
+def redirect_url(url_key: str, session: SessionDep, token: str = Security(sec)):
+    user = verify_token(token.credentials)
+
+    if not user:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    entry = session.exec(select(URLModel).where(URLModel.value == url_key)).first()#, URLModel.username == user["sub"])).first()
 
     if not entry:
         raise HTTPException(status_code=404, detail="error: URL not found")    
@@ -64,19 +74,22 @@ def redirect_url(url_key: str, session: SessionDep):
     return {"value": entry.url}
 
 @router.put("/{url_key}", status_code=200)
-async def update_url(url_key: str, request: Request, session: SessionDep):
+async def update_url(url_key: str, url: URLSchema, session: SessionDep, token: str = Security(sec)):
+    user = verify_token(token.credentials)
+
+    if not user:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    # entry = session.exec(select(URLModel).where(URLModel.value == url_key, URLModel.username == user["sub"])).first()
     entry = session.exec(select(URLModel).where(URLModel.value == url_key)).first()
     
     if not entry:
         raise HTTPException(status_code=404, detail="error: URL not found")
 
-    body = await request.json() # get the request body encoded in json
-    new_url = body.get("url") # get the url from request body 
-
-    if not new_url or not validate_url(new_url): 
+    if not url.value or not validate_url(url.value): 
         raise HTTPException(status_code=400, detail="error: Invalid URL")
     
-    shorten_url = URLModel(url=new_url, value=url_key)
+    shorten_url = URLModel(url=url.value, value=url_key, username=user["sub"])
 
     session.delete(entry)
     session.commit()   
@@ -93,8 +106,8 @@ def delete_url(url_key: str, session: SessionDep, token: str = Security(sec)):
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
     
-    url = session.exec(select(URLModel).where(URLModel.value == url_key, URLModel.username == user["sub"])).first()
-    # url = session.exec(select(URLModel).where(URLModel.value == url_key)).first()
+    # url = session.exec(select(URLModel).where(URLModel.value == url_key, URLModel.username == user["sub"])).first()
+    url = session.exec(select(URLModel).where(URLModel.value == url_key)).first()
 
     if not url:
         raise HTTPException(status_code=404, detail="error: URL not found")
