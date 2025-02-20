@@ -33,6 +33,7 @@ def validate_url(url:str) -> bool:
     pattern = re.compile(regex)
     return bool(re.fullmatch(pattern, url))    
 
+# Call verification on the Auth sercvice
 def verify_token(token: str):
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(f"{AUTH_SERVICE_URL}/users/verify", headers=headers)

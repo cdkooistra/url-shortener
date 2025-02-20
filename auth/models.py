@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends
-from sqlmodel import SQLModel, Field, create_engine, Session, select, Integer, delete
+from sqlmodel import SQLModel, Field, create_engine, Session
 
 sqlite_db = f"sqlite:///database.db"
 

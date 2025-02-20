@@ -4,13 +4,14 @@ from fastapi.security import HTTPBearer
 import os
 from auth.services import verify_user, create_user, update_password
 from auth.models import SessionDep, UserModel
-from sqlmodel import Session, select
+from sqlmodel import select
 from auth.schemas import UserSchema
 from auth.jwt import create_jwt, verify_jwt
 
 
 router = APIRouter()
 
+# Get a list of created users
 @router.get("/", status_code=200)
 def list_users(session: SessionDep):
     keys = session.exec(select(UserModel.username)).all()
@@ -18,33 +19,22 @@ def list_users(session: SessionDep):
         return JSONResponse({}, status_code=200)
     return JSONResponse(keys, status_code=200)
 
-# @router.post("/users")
-# params: username, password
-# do: create user with username and password and store in db -> user_table
-# return 201, 409 if user already exists
-
 @router.post("/users", status_code=201)
 def create_new_users(user: UserSchema, session: SessionDep):
+
     if not create_user(user.username, user.password, session):
-        raise HTTPException(status_code=409, detail="Username already exists")
+        raise HTTPException(status_code=409, detail="Duplicate")
+    
     return {"message": "User created successfully"}
 
-# @router.put("/users")
-# params: username, old-password, new-password
-# do: update password for user with username and old-password
-# return 200, 403 if old-password does not match
 
 @router.put("/users", status_code=200)
 def update_user_password(username: str, old_password: str, new_password: str, session: SessionDep):
+
     if not update_password(username, old_password, new_password, session):
-        raise HTTPException(status_code=403, detail="Invalid credentials")
+        raise HTTPException(status_code=403, detail="Forbidden")
+    
     return {"message": "Password updated successfully"}
-
-
-# @router.post("/users/login")
-# params: username, password
-# do: verify if user exists in table and generate a JWT token
-# return 200, 403 if user does not exist
 
 @router.post("/users/login")
 def login(user: UserSchema, session: SessionDep):
@@ -52,16 +42,19 @@ def login(user: UserSchema, session: SessionDep):
     token = verify_user(user.username, user.password, session)
     
     if not token:
-        raise HTTPException(status_code=403, detail="Invalid credentials")  # Using 403 per your comment
+        raise HTTPException(status_code=403, detail="Forbidden") 
     
     return {"token": token, "token_type": "bearer"}
 
-
+# Additional get for verifying user's token on app
 @router.get("/users/verify")
 def verify_user_token(token: str = Security(HTTPBearer())):
+
     payload = verify_jwt(token.credentials)
+
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid token")
+    
     return payload
 
 
