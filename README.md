@@ -24,6 +24,6 @@ docker compose up -d
 
 ### References
 
-Insperations for URL validation regex
+Inspirations for URL validation regex
 [1] <https://www.geeksforgeeks.org/check-if-an-url-is-valid-or-not-using-regular-expression/>
 [2] <https://docs.netapp.com/us-en/oncommand-insight/config-admin/regular-expression-examples.html#formatting-regular-expressions>
