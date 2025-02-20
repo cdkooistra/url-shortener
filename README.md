@@ -6,21 +6,20 @@ RESTful URL shortening service
 
 ## Installation Setup
 
-Requires python 3.9+
-
-Install requirements: pip install -r requirements.txt
-
-How to run app/auth (specify separate port for app and auth agent):
+Requires [Docker (Compose)](https://www.docker.com/):
 
 ```bash
-uvicorn app.main:app --reload --port [PORT]
-uvicorn auth.main:app --reload --port [PORT]
+mkdir secrets
+openssl rand -hex 16 > secrets/db_pw
+openssl rand -hex 32 > secrets/secret_key
 ```
 
-How to run (Windows):
+## Usage
+
+How to run (when in ./docker):
 
 ```bash
-fastapi dev main.py
+docker compose up -d
 ```
 
 ### References
