@@ -173,5 +173,4 @@ cython_debug/
 # Python virtual env
 .venv/
 
-# Database
-*.db
+secrets/
