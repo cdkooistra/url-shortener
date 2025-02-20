@@ -4,8 +4,6 @@ import hashlib
 import requests
 import os
 
-AUTH_SERVICE_URL = "http://127.0.0.1:8001"
-
 def generate_id(url: str) -> str:
     """
     Generate a short identifier from the first three letters of the domain name.
@@ -36,7 +34,7 @@ def validate_url(url:str) -> bool:
 # Call verification on the Auth sercvice
 def verify_token(token: str):
     headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(f"{AUTH_SERVICE_URL}/users/verify", headers=headers)
+    response = requests.get(f"{os.getenv("AUTH_URL")}/users/verify", headers=headers)
     
     if response.status_code != 200:
         return None  # Invalid token

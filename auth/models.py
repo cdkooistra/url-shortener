@@ -1,11 +1,12 @@
 from typing import Annotated
 from fastapi import Depends
 from sqlmodel import SQLModel, Field, create_engine, Session
+from auth.utils import read_secret
 
-sqlite_db = f"sqlite:///database.db"
+DATABASE_PW = read_secret("db_pw")
+DATABASE_URL = f"postgresql+psycopg2://postgres_user:{DATABASE_PW}@postgres/database"
 
-# check_same_thread: False is required to allow FastAPI to use the same db in different threads
-engine = create_engine(sqlite_db, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL)
 
 def create_database():
     SQLModel.metadata.create_all(engine)
