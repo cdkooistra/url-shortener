@@ -48,9 +48,12 @@ def login(user: UserSchema, session: SessionDep):
 
 # Additional get for verifying user's token on app
 @router.get("/users/verify")
-def verify_user_token(auth: str = Header(None)):
+def verify_user_token(authorization: str = Header(None)):
 
-    payload = verify_jwt(auth)  # Use raw token
+    if not authorization:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    payload = verify_jwt(authorization)  # Use raw token
 
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid token")

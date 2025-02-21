@@ -8,9 +8,12 @@ from app.schemas import URLSchema, URLUpdateSchema
 router = APIRouter()
 
 @router.get("/", status_code=200)
-def list_keys(session: SessionDep, auth: str = Header(None)):
+def list_keys(session: SessionDep, authorization: str = Header(None)):
 
-    user = verify_token(auth)
+    if not authorization:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    user = verify_token(authorization)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -21,9 +24,12 @@ def list_keys(session: SessionDep, auth: str = Header(None)):
     return JSONResponse(keys, status_code=200)
 
 @router.post("/", status_code = 201)
-def shorten_url(item: URLSchema, session: SessionDep, auth: str = Header(None)):
+def shorten_url(item: URLSchema, session: SessionDep, authorization: str = Header(None)):
 
-    user = verify_token(auth)
+    if not authorization:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    user = verify_token(authorization)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -44,9 +50,12 @@ def shorten_url(item: URLSchema, session: SessionDep, auth: str = Header(None)):
     return {"id": shorten_url.value}
 
 @router.delete("/" , status_code=404) 
-def delete_nothing(session: SessionDep, auth: str = Header(None)):
+def delete_nothing(session: SessionDep, authorization: str = Header(None)):
+
+    if not authorization:
+        raise HTTPException(status_code=403, detail="Forbidden")
     
-    user = verify_token(auth)
+    user = verify_token(authorization)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -65,9 +74,12 @@ def redirect_url(url_key: str, session: SessionDep):
     return {"value": entry.url}
 
 @router.put("/{url_key}", status_code=200)
-async def update_url(url_key: str, url: URLUpdateSchema, session: SessionDep, auth: str = Header(None)):
+async def update_url(url_key: str, url: URLUpdateSchema, session: SessionDep, authorization: str = Header(None)):
 
-    user = verify_token(auth)
+    if not authorization:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    user = verify_token(authorization)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -91,9 +103,12 @@ async def update_url(url_key: str, url: URLUpdateSchema, session: SessionDep, au
     return {"value": shorten_url.value}
 
 @router.delete("/{url_key}", status_code=204)
-def delete_url(url_key: str, session: SessionDep, auth: str = Header(None)):
+def delete_url(url_key: str, session: SessionDep, authorization: str = Header(None)):
 
-    user = verify_token(auth)
+    if not authorization:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    user = verify_token(authorization)
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
 
