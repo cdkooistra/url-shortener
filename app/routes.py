@@ -1,18 +1,16 @@
 import validators
-from fastapi import APIRouter, HTTPException, Security
-from fastapi.security import HTTPBearer
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import JSONResponse, Response
 from app.services import generate_id, validate_url, verify_token
 from app.models import SessionDep, select, URLModel, delete
 from app.schemas import URLSchema, URLUpdateSchema
 
 router = APIRouter()
-secrue = HTTPBearer()
 
 @router.get("/", status_code=200)
-def list_keys(session: SessionDep, token: str = Security(secrue)):
+def list_keys(session: SessionDep, auth: str = Header(None)):
 
-    user = verify_token(token.credentials)
+    user = verify_token(auth)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -23,9 +21,9 @@ def list_keys(session: SessionDep, token: str = Security(secrue)):
     return JSONResponse(keys, status_code=200)
 
 @router.post("/", status_code = 201)
-def shorten_url(item: URLSchema, session: SessionDep, token: str = Security(secrue)):
+def shorten_url(item: URLSchema, session: SessionDep, auth: str = Header(None)):
 
-    user = verify_token(token.credentials)
+    user = verify_token(auth)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -46,8 +44,9 @@ def shorten_url(item: URLSchema, session: SessionDep, token: str = Security(secr
     return {"id": shorten_url.value}
 
 @router.delete("/" , status_code=404) 
-def delete_nothing(session: SessionDep, token: str = Security(secrue)):
-    user = verify_token(token.credentials)
+def delete_nothing(session: SessionDep, auth: str = Header(None)):
+    
+    user = verify_token(auth)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -57,12 +56,7 @@ def delete_nothing(session: SessionDep, token: str = Security(secrue)):
     return JSONResponse(status_code=404, content={})
 
 @router.get("/{url_key}", status_code=301)
-def redirect_url(url_key: str, session: SessionDep, token: str = Security(secrue)):
-    user = verify_token(token.credentials)
-
-    if not user:
-        raise HTTPException(status_code=403, detail="Forbidden")
-
+def redirect_url(url_key: str, session: SessionDep):
     entry = session.exec(select(URLModel).where(URLModel.value == url_key)).first()
 
     if not entry:
@@ -71,8 +65,9 @@ def redirect_url(url_key: str, session: SessionDep, token: str = Security(secrue
     return {"value": entry.url}
 
 @router.put("/{url_key}", status_code=200)
-async def update_url(url_key: str, url: URLUpdateSchema, session: SessionDep, token: str = Security(secrue)):
-    user = verify_token(token.credentials)
+async def update_url(url_key: str, url: URLUpdateSchema, session: SessionDep, auth: str = Header(None)):
+
+    user = verify_token(auth)
 
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -96,9 +91,9 @@ async def update_url(url_key: str, url: URLUpdateSchema, session: SessionDep, to
     return {"value": shorten_url.value}
 
 @router.delete("/{url_key}", status_code=204)
-def delete_url(url_key: str, session: SessionDep, token: str = Security(secrue)):
+def delete_url(url_key: str, session: SessionDep, auth: str = Header(None)):
 
-    user = verify_token(token.credentials)
+    user = verify_token(auth)
     if not user:
         raise HTTPException(status_code=403, detail="Forbidden")
 

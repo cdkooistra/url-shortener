@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Response, Security
+from fastapi import APIRouter, HTTPException, Response, Security, Header
 from fastapi.responses import JSONResponse, Response
 from fastapi.security import HTTPBearer
 import os
@@ -48,13 +48,13 @@ def login(user: UserSchema, session: SessionDep):
 
 # Additional get for verifying user's token on app
 @router.get("/users/verify")
-def verify_user_token(token: str = Security(HTTPBearer())):
+def verify_user_token(auth: str = Header(None)):
 
-    payload = verify_jwt(token.credentials)
+    payload = verify_jwt(auth)  # Use raw token
 
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid token")
-    
+
     return payload
 
 
