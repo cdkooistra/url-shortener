@@ -1,6 +1,8 @@
 from urllib.parse import urlsplit
 import re
 import hashlib
+import requests
+import os
 
 def generate_id(url: str) -> str:
     """
@@ -13,13 +15,6 @@ def generate_id(url: str) -> str:
 
     id = domain[:2]  # Take first three letters of domain to be the id
     hash_val = hashlib.md5(url.encode()).hexdigest()[:2]
-
-    # hold = id
-    # counter = 1
-    # while id in url_db:
-    #     print(counter)
-    #     id = hold + str(counter)
-    #     counter += 1
 
     return str(id + hash_val)
 
@@ -35,3 +30,14 @@ def validate_url(url:str) -> bool:
     
     pattern = re.compile(regex)
     return bool(re.fullmatch(pattern, url))    
+
+# Call verification on the Auth sercvice
+def verify_token(token: str):
+
+    headers = {"Authorization": token}
+    response = requests.get(f"{os.getenv("AUTH_URL")}/users/verify", headers=headers)
+
+    if response.status_code != 200:
+        return None 
+
+    return response.json()  # Returns the payload
