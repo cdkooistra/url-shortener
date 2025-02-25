@@ -20,7 +20,7 @@ class TestApi(unittest.TestCase):
     response_create = requests.post(url_create, json={'username': test_username, 'password': test_password})
     response_login = requests.post(url_login, json={'username': test_username, 'password': test_password})
 
-    headers = {'Authorization': json.loads(response_login.content)["token"]}
+    headers = {'Authorization': f'Bearer {json.loads(response_login.content)["token"]}'}
     headers_wrong = {'Authorization': 'wrong'}
 
     def populate_variables_from_csv(self):

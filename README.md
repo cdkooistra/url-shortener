@@ -7,11 +7,18 @@ RESTful URL shortening service
 ## Installation Setup
 
 Requires [Docker (Compose)](https://www.docker.com/):
+Requires [OpenSSL](https://openssl.org/):
 
 ```bash
 mkdir secrets
 openssl rand -hex 16 > secrets/db_pw
 openssl rand -hex 32 > secrets/secret_key
+```
+
+For windows users, run:
+```bash
+(Get-Content ../secrets/db_pw) | Set-Content -NoNewline ../secrets/db_pw
+(Get-Content ../secrets/secret_key) | Set-Content -NoNewline ../secrets/secret_key
 ```
 
 ## Usage
