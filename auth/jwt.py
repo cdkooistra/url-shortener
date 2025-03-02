@@ -4,6 +4,8 @@ from typing import Union
 import json
 import os
 
+secret_key = os.getenv("SECRET_KEY") 
+
 def create_jwt(payload: dict) -> str:
     header = {
         "alg": "HS256",
@@ -14,14 +16,14 @@ def create_jwt(payload: dict) -> str:
     payload["exp"] = (datetime.now() + timedelta(minutes=int(os.environ.get("TOKEN_EXPIRATION_MINUTES")))).timestamp()
     payload_enc = b64_encode(json.dumps(payload).encode()) 
 
-    signature = hmac.new(read_secret("secret_key").encode(), f"{header_enc}.{payload_enc}".encode(), sha256).digest()
+    signature = hmac.new(secret_key.encode(), f"{header_enc}.{payload_enc}".encode(), sha256).digest()
     signature_enc = b64_encode(signature)
 
     return f"{header_enc}.{payload_enc}.{signature_enc}"
 
 def verify_jwt(token: str) -> Union[dict, bool]:
     header_enc, payload_enc, signature_enc = token.split(".")
-    expected_signature = hmac.new(read_secret("secret_key").encode(), f"{header_enc}.{payload_enc}".encode(), sha256).digest()
+    expected_signature = hmac.new(secret_key.encode(), f"{header_enc}.{payload_enc}".encode(), sha256).digest()
 
     if not hmac.compare_digest(b64_encode(expected_signature), signature_enc):
         return False

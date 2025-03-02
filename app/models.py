@@ -2,9 +2,11 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import SQLModel, Field, create_engine, Session, select, Integer, delete
 from app.utils import read_secret
+import os
 
-DATABASE_PW = read_secret("db_pw")
+DATABASE_PW = os.getenv("DB_PW")
 DATABASE_URL = f"postgresql+psycopg2://postgres_user:{DATABASE_PW}@postgres/database"
+
 
 engine = create_engine(DATABASE_URL)
 

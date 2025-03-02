@@ -27,6 +27,20 @@ How to run (when in ./docker):
 
 ```bash
 docker compose up -d
+
+```
+
+
+### Set up for Kubernetes
+
+```
+DB_PASSWORD=$(openssl rand -hex 16)
+SECRET_KEY=$(openssl rand -hex 32)
+
+kubectl create secret generic app-secrets \
+  --from-literal=db_pw="$DB_PASSWORD" \
+  --from-literal=secret_key="$SECRET_KEY"
+
 ```
 
 ### References
