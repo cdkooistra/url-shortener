@@ -33,6 +33,8 @@ docker compose up -d
 
 ### Set up for Kubernetes
 
+Created secret folder within the virtual machine:
+
 ```
 DB_PASSWORD=$(openssl rand -hex 16)
 SECRET_KEY=$(openssl rand -hex 32)
