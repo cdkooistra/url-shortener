@@ -4,6 +4,9 @@ from typing import Union
 import json
 import os
 
+# For Kubernetes: variable used rather than calling read_secret in lines 20 and 27
+# secret_key = os.getenv("SECRET_KEY") 
+
 def create_jwt(payload: dict) -> str:
     header = {
         "alg": "HS256",
