@@ -2,8 +2,6 @@ from base64 import urlsafe_b64decode, urlsafe_b64encode
 from hashlib import sha256
 import hmac
 
-# i should probably start using docstrings for these comments
-
 def b64_encode(data: bytes) -> str:
     # Helper function to encode bytes into base64 encoded strings.
     # We need to use urlsafe_b64encode as per JWT convention.
